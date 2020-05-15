@@ -1,0 +1,9 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.tdeado.core.config.AntPathMatcherConfig,\
+  com.tdeado.core.config.FileConfigurer,\
+  com.tdeado.core.config.GlobalExceptionHandler,\
+  com.tdeado.core.config.MybatisPlusConfig,\
+  com.tdeado.core.config.RestTemplateConfigurer,\
+  com.tdeado.core.config.WebConfigurer,\
+  com.tdeado.core.service.impl.FileServiceImpl,\
+  com.tdeado.core.service.impl.RedisServiceImpl

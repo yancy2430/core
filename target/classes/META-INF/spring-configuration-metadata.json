@@ -1,0 +1,17 @@
+{
+  "groups": [
+    {
+      "name": "tdeado.code.file",
+      "type": "com.tdeado.core.config.FileProperties",
+      "sourceType": "com.tdeado.core.config.FileProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "tdeado.code.file.upload-dir",
+      "type": "java.lang.String",
+      "sourceType": "com.tdeado.core.config.FileProperties"
+    }
+  ],
+  "hints": []
+}
