@@ -1,6 +1,8 @@
 package com.tdeado.core.config;
 
 import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
+import com.baomidou.mybatisplus.core.incrementer.DefaultIdentifierGenerator;
+import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.extension.MybatisMapWrapperFactory;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
@@ -28,6 +30,11 @@ public class MybatisPlusConfig {
         return new PaginationInterceptor();
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public IdentifierGenerator idGenerator() {
+        return new DefaultIdentifierGenerator();
+    }
     /**
      * 填充器
      */

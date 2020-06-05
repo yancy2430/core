@@ -89,15 +89,15 @@ public class WebConfigurer implements WebMvcConfigurer {
     @ConditionalOnMissingBean
     public MappingJackson2HttpMessageConverter jackson2HttpMessageConverter() {
         final Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
-        builder.serializationInclusion(JsonInclude.Include.NON_NULL);
+        builder.serializationInclusion(JsonInclude.Include.ALWAYS);
         final ObjectMapper objectMapper = builder.build();
         SimpleModule simpleModule = new SimpleModule();
         // Long 转为 String 防止 js 丢失精度
         simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
-        simpleModule.addSerializer(Number.class, ToStringSerializer.instance);
         objectMapper.registerModule(simpleModule);
         // 忽略 transient 关键词属性
         objectMapper.configure(MapperFeature.PROPAGATE_TRANSIENT_MARKER, true);
+
         return new MappingJackson2HttpMessageConverter(objectMapper);
     }
 //    @Bean

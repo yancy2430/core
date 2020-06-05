@@ -14,13 +14,15 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -75,16 +77,64 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public byte[] getFileByUrl(String url) {
+    public String getFileByUrl(String url) {
             HttpHeaders headers = new HttpHeaders();
             HttpEntity<Resource> httpEntity = new HttpEntity<Resource>(headers);
             ResponseEntity<byte[]> response = restTemplate.exchange(url, HttpMethod.GET,
                     httpEntity, byte[].class);
             if (response.getStatusCode().is2xxSuccessful()) {
-                return response.getBody();
+
+
+                String[] urr = url.split("\\.");
+                String newFileName = UUID.randomUUID().toString() + ".jpg";
+                newFileName = this.fileStorageLocation.getFileName() + "/" + newFileName;
+                BufferedOutputStream bos = null;
+                FileOutputStream fos = null;
+                File file = null;
+                try {
+                    file = new File(newFileName);
+                    fos = new FileOutputStream(file);
+                    bos = new BufferedOutputStream(fos);
+                    bos.write(Objects.requireNonNull(response.getBody()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (bos != null) {
+                        try {
+                            bos.close();
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                    if (fos != null) {
+                        try {
+                            fos.close();
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+                return  "/" + newFileName;
+
             }else {
                 throw new ApiException("下载图片失败");
             }
+
+    }
+
+    @Override
+    public byte[] getFileByteByUrl(String url) {
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<Resource> httpEntity = new HttpEntity<Resource>(headers);
+        ResponseEntity<byte[]> response = restTemplate.exchange(url, HttpMethod.GET,
+                httpEntity, byte[].class);
+        if (response.getStatusCode().is2xxSuccessful()) {
+
+            return  response.getBody();
+
+        }else {
+            throw new ApiException("下载图片失败");
+        }
 
     }
 
@@ -108,5 +158,54 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    public String getFileByBase64(String base64) {
+        //定义一个正则表达式的筛选规则，为了获取图片的类型
+        String rgex = "data:image/(.*?);base64";
+
+        String type = getSubUtilSimple(base64, rgex);
+        //去除base64图片的前缀
+        base64 = base64.replaceFirst("data:(.+?);base64,", "");
+        byte[] b;
+        byte[] bs;
+        OutputStream os = null;
+        // 格式化并获取当前日期（用来命名）
+        //把图片转换成二进制
+        b = java.util.Base64.getDecoder().decode(base64);
+        //生成路径
+        //随机生成图片的名字，同时根据类型结尾
+
+        String newFileName = this.fileStorageLocation.getFileName() + "/" + UUID.randomUUID() + ".jpg";
+
+        File imageFile = new File(newFileName);
+        // 保存
+        try {
+            os = new FileOutputStream(imageFile);
+            os.write(b);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+
+        }finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    e.getLocalizedMessage();
+                }
+            }
+        }
+
+        return "/"+newFileName;
+    }
+    public static String getSubUtilSimple(String soap,String rgex){
+        Pattern pattern = Pattern.compile(rgex);
+        Matcher m = pattern.matcher(soap);
+        while(m.find()){
+            return m.group(1);
+        }
+        return "";
+
+
+    }
 
 }

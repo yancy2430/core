@@ -9,6 +9,8 @@ public interface FileService {
 
     String storeFile(MultipartFile file);
     String storeFile(File file);
-    byte[] getFileByUrl(String url);
+    String getFileByUrl(String url);
+    byte[] getFileByteByUrl(String url);
     Resource loadFileAsResource(String fileName);
+    String getFileByBase64(String base64);
 }

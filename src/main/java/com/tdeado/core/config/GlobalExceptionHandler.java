@@ -46,6 +46,7 @@ public class GlobalExceptionHandler {
         log.error("RuntimeException {}",exception.getMessage());
         return R.failed(exception.getMessage());
     }
+
     @ExceptionHandler(value = MissingServletRequestParameterException.class)
     @ResponseBody
     public R<String> runtime(MissingServletRequestParameterException exception){

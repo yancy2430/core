@@ -9,6 +9,7 @@ com/tdeado/core/service/impl/RedisServiceImpl.class
 com/tdeado/core/service/impl/RedisServiceImpl$7.class
 com/tdeado/core/service/RedisService.class
 com/tdeado/core/service/impl/RedisServiceImpl$2.class
+com/tdeado/core/config/GsonConfigurer$6.class
 com/tdeado/core/config/GsonConfigurer.class
 com/tdeado/core/service/impl/FileServiceImpl.class
 com/tdeado/core/config/WebConfigurer.class
@@ -22,9 +23,11 @@ com/tdeado/core/service/impl/RedisServiceImpl$4.class
 META-INF/spring-configuration-metadata.json
 com/tdeado/core/controller/BaseController.class
 com/tdeado/core/service/impl/RedisServiceImpl$6.class
+com/tdeado/core/config/GsonConfigurer$7.class
 com/tdeado/core/service/impl/RedisServiceImpl$1.class
 com/tdeado/core/config/FileProperties.class
 com/tdeado/core/config/GsonConfigurer$2.class
+com/tdeado/core/config/GsonConfigurer$5.class
 com/tdeado/core/service/impl/RedisServiceImpl$12.class
 com/tdeado/core/service/impl/RedisServiceImpl$3.class
 com/tdeado/core/config/GsonConfigurer$3.class
