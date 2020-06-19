@@ -1,26 +1,22 @@
 package com.tdeado.core.auth;
 
+
 import com.google.gson.Gson;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * JWT 工具类
+ * @author yangze
  */
-@Slf4j
 public class JwtTokenUtil implements Serializable {
-
+    private static Gson gson = new Gson();
     private static final String CLAIM_KEY_USERNAME = "sub";
-    private static final Gson gson = new Gson();
 
     /**
      * 5天(毫秒)
@@ -31,30 +27,32 @@ public class JwtTokenUtil implements Serializable {
      */
     private static final String SECRET = "secret";
 
-    /**
-     * 验证JWT
-     */
-    public static boolean validateToken(String token) {
-        return (!isTokenExpired(token));
 
-    }
     /**
-     * 签发jwt 仅限系统间调用 用户操作流程中请勿使用此方法创建jwt
+     * 签发JWT
      */
-    protected static String generateSystemToken() {
+    public static String generateToken(Object user) {
         Map<String, Object> claims = new HashMap<>(16);
-        claims.put(CLAIM_KEY_USERNAME, "system");
         claims.put("iat",System.currentTimeMillis());
+        claims.put("user",gson.toJson(user));
         return Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(new Date(Instant.now().toEpochMilli() + EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
     }
+
+    /**
+     * 验证JWT
+     */
+    public static Boolean validateToken(String token) {
+        return (!isTokenExpired(token));
+    }
+
     /**
      * 获取token是否过期
      */
-    public static boolean isTokenExpired(String token) {
+    public static Boolean isTokenExpired(String token) {
         Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
@@ -74,13 +72,11 @@ public class JwtTokenUtil implements Serializable {
         Date expiration = getClaimsFromToken(token).getExpiration();
         return expiration;
     }
-
     /**
-     * 获取权限列表
+     * 获取user
      */
-    public static List<String> getRoles(String token) {
-        List<String> roles = (List<String>) getClaimsFromToken(token).get("roles");
-        return roles;
+    public static Object getUser(String token) {
+        return getClaimsFromToken(token).get("user");
     }
 
     /**
@@ -93,11 +89,6 @@ public class JwtTokenUtil implements Serializable {
                 .getBody();
         return claims;
     }
-//
-//    public static void main(String[] args) {
-//        User s = getUser("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwiYXVkIjoidXNlciIsInJvbGVzIjpbInN5c3RlbSJdLCJleHAiOjE1Njk2NTI0MDcsImlhdCI6MTU2OTIyMDQwNzI0NSwidXNlciI6eyJtb2JpbGUiOiIxODE1MjczMzY2MCIsImlkIjoiMSIsImVtYWlsIjoiMTgxNTI3MzM2NjAiLCJ1c2VybmFtZSI6InVzZXIifX0.5o-rSkCSEPQLdUJkC55PoYEQm7ZLjDxrq0Vt8GGt_c0dHMsueNQYnQoVbYR3b5N74XSvoYAyOu-kMKj6sFPr0w");
-//        System.err.println(s);
-//    }
 
 
 }

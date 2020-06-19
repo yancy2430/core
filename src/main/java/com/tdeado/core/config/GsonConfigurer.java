@@ -54,6 +54,28 @@ public class GsonConfigurer {
                             throw new JsonSyntaxException(e);
                         }
                     }
+                }).registerTypeAdapter(long.class, new TypeAdapter<Object>() {
+                    @Override
+                    public void write(JsonWriter out, Object value) throws IOException {
+                        out.value(Long.parseLong(value.toString()));
+                    }
+
+                    @Override
+                    public Number read(JsonReader in) throws IOException {
+                        if (in.peek() == JsonToken.NULL) {
+                            in.nextNull();
+                            return null;
+                        }
+                        try {
+                            String result = in.nextString();
+                            if ("".equals(result)) {
+                                return null;
+                            }
+                            return Long.parseLong(result);
+                        } catch (NumberFormatException e) {
+                            throw new JsonSyntaxException(e);
+                        }
+                    }
                 })
                 .registerTypeAdapter(Long.class, new TypeAdapter<Object>() {
                     @Override
@@ -77,41 +99,18 @@ public class GsonConfigurer {
                         }
                     }
                 })
-                .registerTypeAdapter(long.class, new TypeAdapter<Object>() {
-                    @Override
-                    public void write(JsonWriter out, Object value) throws IOException {
-                        out.value(value.toString());
-                    }
 
-                    @Override
-                    public Object read(JsonReader in) throws IOException {
-                        if (in.peek() == JsonToken.NULL) {
-                            in.nextNull();
-                            return null;
-                        }
-                        try {
-                            String result = in.nextString();
-                            if ("".equals(result)) {
-                                return null;
-                            }
-                            return result;
-                        } catch (NumberFormatException e) {
-                            throw new JsonSyntaxException(e);
-                        }
-                    }
-                })
-                .setLongSerializationPolicy(LongSerializationPolicy.STRING)
                 .create();
     }
-    @Bean
-    @ConditionalOnMissingBean
-    public HttpMessageConverters customConverters() {
-
-        Collection<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
-
-        GsonHttpMessageConverter gsonHttpMessageConverter = new GsonHttpMessageConverter(gsonInit());
-        messageConverters.add(gsonHttpMessageConverter);
-
-        return new HttpMessageConverters(true, messageConverters);
-    }
+//    @Bean
+//    @ConditionalOnMissingBean
+//    public HttpMessageConverters customConverters() {
+//
+//        Collection<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
+//
+//        GsonHttpMessageConverter gsonHttpMessageConverter = new GsonHttpMessageConverter(gsonInit());
+//        messageConverters.add(gsonHttpMessageConverter);
+//
+//        return new HttpMessageConverters(true, messageConverters);
+//    }
 }

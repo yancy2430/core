@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -24,6 +25,9 @@ import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -73,6 +77,7 @@ public class WebConfigurer implements WebMvcConfigurer {
                 return null;
             }
         }, true));
+
     }
 
     /**
@@ -90,6 +95,9 @@ public class WebConfigurer implements WebMvcConfigurer {
     public MappingJackson2HttpMessageConverter jackson2HttpMessageConverter() {
         final Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
         builder.serializationInclusion(JsonInclude.Include.ALWAYS);
+        builder.serializerByType(LocalDateTime.class,new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        builder.serializerByType(LocalDate.class,new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+
         final ObjectMapper objectMapper = builder.build();
         SimpleModule simpleModule = new SimpleModule();
         // Long 转为 String 防止 js 丢失精度
@@ -97,6 +105,9 @@ public class WebConfigurer implements WebMvcConfigurer {
         objectMapper.registerModule(simpleModule);
         // 忽略 transient 关键词属性
         objectMapper.configure(MapperFeature.PROPAGATE_TRANSIENT_MARKER, true);
+
+
+//        return builder -> builder.serializerByType(LocalDateTime.class, localDateTimeDeserializer());
 
         return new MappingJackson2HttpMessageConverter(objectMapper);
     }
@@ -113,17 +124,17 @@ public class WebConfigurer implements WebMvcConfigurer {
      * 跨域同源策略配置
      * </p>
      */
-    @Bean
-    @ConditionalOnMissingBean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
+//    @Bean
+//    @ConditionalOnMissingBean
+//    public CorsFilter corsFilter() {
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        CorsConfiguration config = new CorsConfiguration();
+//        config.setAllowCredentials(true);
+//        config.addAllowedOrigin("*");
+//        config.addAllowedOrigin("*");
+//        config.addAllowedHeader("*");
+//        config.addAllowedMethod("*");
+//        source.registerCorsConfiguration("/**", config);
+//        return new CorsFilter(source);
+//    }
 }
