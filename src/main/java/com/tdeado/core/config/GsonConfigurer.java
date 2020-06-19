@@ -38,7 +38,6 @@ public class GsonConfigurer {
                     public void write(JsonWriter out, Number value) throws IOException {
                         out.value(value);
                     }
-
                     @Override
                     public Number read(JsonReader in) throws IOException {
                         if (in.peek() == JsonToken.NULL) {
@@ -56,14 +55,13 @@ public class GsonConfigurer {
                         }
                     }
                 })
-                .registerTypeAdapter(Long.class, new TypeAdapter<Number>() {
+                .registerTypeAdapter(Long.class, new TypeAdapter<Object>() {
                     @Override
-                    public void write(JsonWriter out, Number value) throws IOException {
-                        out.value(value);
+                    public void write(JsonWriter out, Object value) throws IOException {
+                        out.value(value.toString());
                     }
-
                     @Override
-                    public Number read(JsonReader in) throws IOException {
+                    public Object read(JsonReader in) throws IOException {
                         if (in.peek() == JsonToken.NULL) {
                             in.nextNull();
                             return null;
@@ -73,20 +71,20 @@ public class GsonConfigurer {
                             if ("".equals(result)) {
                                 return null;
                             }
-                            return Long.parseLong(result);
+                            return result;
                         } catch (NumberFormatException e) {
                             throw new JsonSyntaxException(e);
                         }
                     }
                 })
-                .registerTypeAdapter(long.class, new TypeAdapter<Number>() {
+                .registerTypeAdapter(long.class, new TypeAdapter<Object>() {
                     @Override
-                    public void write(JsonWriter out, Number value) throws IOException {
-                        out.value(value);
+                    public void write(JsonWriter out, Object value) throws IOException {
+                        out.value(value.toString());
                     }
 
                     @Override
-                    public Number read(JsonReader in) throws IOException {
+                    public Object read(JsonReader in) throws IOException {
                         if (in.peek() == JsonToken.NULL) {
                             in.nextNull();
                             return null;
@@ -96,7 +94,7 @@ public class GsonConfigurer {
                             if ("".equals(result)) {
                                 return null;
                             }
-                            return Long.parseLong(result);
+                            return result;
                         } catch (NumberFormatException e) {
                             throw new JsonSyntaxException(e);
                         }
