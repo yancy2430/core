@@ -26,29 +26,13 @@ public class GsonConfigurer {
     public Gson gsonInit(){
         return new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd HH:mm:ss")
-                .registerTypeAdapter(LocalDateTime.class, new JsonSerializer<LocalDateTime>() {
-                            @Override
-                            public JsonElement serialize(LocalDateTime src, Type typeOfSrc, JsonSerializationContext context) {
-                                return new JsonPrimitive(src.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                            }
-                        }
-                ).registerTypeAdapter(LocalDate.class, new JsonSerializer<LocalDate>() {
-                    @Override
-                    public JsonElement serialize(LocalDate src, Type typeOfSrc, JsonSerializationContext context) {
-                        return new JsonPrimitive(src.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-                    }
-                }).registerTypeAdapter(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
-                    @Override
-                    public LocalDateTime deserialize(JsonElement json, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-                        String datetime = json.getAsJsonPrimitive().getAsString();
-                        return LocalDateTime.parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                    }
-                }).registerTypeAdapter(LocalDate.class, new JsonDeserializer<LocalDate>() {
-                    @Override
-                    public LocalDate deserialize(JsonElement json, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-                        String datetime = json.getAsJsonPrimitive().getAsString();
-                        return LocalDate.parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                    }
+                .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) -> new JsonPrimitive(src.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                ).registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (src, typeOfSrc, context) -> new JsonPrimitive(src.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))).registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>) (json, type, jsonDeserializationContext) -> {
+                    String datetime = json.getAsJsonPrimitive().getAsString();
+                    return LocalDateTime.parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                }).registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>) (json, type, jsonDeserializationContext) -> {
+                    String datetime = json.getAsJsonPrimitive().getAsString();
+                    return LocalDate.parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
                 }).registerTypeAdapter(Number.class, new TypeAdapter<Number>() {
                     @Override
                     public void write(JsonWriter out, Number value) throws IOException {
@@ -118,7 +102,7 @@ public class GsonConfigurer {
                         }
                     }
                 })
-
+                .setLongSerializationPolicy(LongSerializationPolicy.STRING)
                 .create();
     }
     @Bean
@@ -127,8 +111,7 @@ public class GsonConfigurer {
 
         Collection<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
 
-        GsonHttpMessageConverter gsonHttpMessageConverter = new GsonHttpMessageConverter();
-        gsonHttpMessageConverter.setGson(gsonInit());
+        GsonHttpMessageConverter gsonHttpMessageConverter = new GsonHttpMessageConverter(gsonInit());
         messageConverters.add(gsonHttpMessageConverter);
 
         return new HttpMessageConverters(true, messageConverters);

@@ -136,6 +136,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler(value = Exception.class)
     public R<Object> handleBadRequest(Exception e) {
+        e.printStackTrace();
         log.error("Exception {}",e.getMessage());
         return R.failed(e.getMessage());
     }
