@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -96,7 +97,7 @@ public class WebConfigurer implements WebMvcConfigurer {
         final Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
         builder.serializationInclusion(JsonInclude.Include.ALWAYS);
         builder.serializerByType(LocalDateTime.class,new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        builder.serializerByType(LocalDate.class,new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        builder.serializerByType(LocalDate.class,new LocalDateSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
         final ObjectMapper objectMapper = builder.build();
         SimpleModule simpleModule = new SimpleModule();
