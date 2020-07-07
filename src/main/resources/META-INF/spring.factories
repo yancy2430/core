@@ -8,4 +8,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.tdeado.core.config.GsonConfigurer,\
   com.tdeado.core.service.impl.FileServiceImpl,\
   com.tdeado.core.service.impl.RedisServiceImpl,\
-  com.tdeado.core.utils.SpringUtils
+  com.tdeado.core.utils.SpringUtils,\
+  com.tdeado.core.controller.IController
