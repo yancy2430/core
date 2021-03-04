@@ -1,4 +1,4 @@
-package com.tdeado.core.utils;
+package com.tdeado.core.util;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

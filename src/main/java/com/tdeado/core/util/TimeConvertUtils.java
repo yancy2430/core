@@ -1,4 +1,4 @@
-package com.tdeado.core.utils;
+package com.tdeado.core.util;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
