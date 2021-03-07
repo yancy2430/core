@@ -40,7 +40,7 @@ public class TdFieldSerializer extends JsonSerializer<Object> implements Context
             }
         }
         if (!field.foreign().equals(Void.class)) {//是外键 添加Str字段
-            ForeignConversionService foreignConversionService = SpringUtils.getBean("foreignConversionService");
+            ForeignConversionService foreignConversionService = SpringUtils.getBean("com.tdeado.core.service.ForeignConversionService");
             newValue = foreignConversionService.conversion(field.foreign(), value.toString());
         }
         jsonGenerator.writeObject(newValue);

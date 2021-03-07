@@ -10,5 +10,9 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.tdeado.core.service.impl.RedisServiceImpl,\
   com.tdeado.core.service.impl.EmailServiceImpl,\
   com.tdeado.core.util.SpringUtils,\
-  com.tdeado.core.util.PackagUtils
+  com.tdeado.core.util.PackagUtils,\
+  com.tdeado.core.service.ForeignConversionService,\
+  com.tdeado.core.config.UploadFileProperties,\
+  com.tdeado.core.provider.QueryParamProvider,\
+  com.tdeado.core.config.ConfigArgumentResolvers
 
