@@ -55,6 +55,19 @@ public class ForeignConversionService {
     @Value("${mybatis-plus.global-config.db-config.table-prefix}")
     private String prefix;
     @PostConstruct
+    public void init(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    initializeForeignCache();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
     public void initializeForeignCache() throws IllegalAccessException {
         log.info("开始初始化外键缓存");
         List<Class<?>> ps = PackagUtils.getClasssFromPackage(entityPackage);
