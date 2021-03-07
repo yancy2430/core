@@ -56,20 +56,17 @@ public class ForeignConversionService {
     private String prefix;
     @PostConstruct
     public void init(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    initializeForeignCache();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+        new Thread(() -> {
+            try {
+                initializeForeignCache();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
             }
         }).start();
     }
 
     public void initializeForeignCache() throws IllegalAccessException {
-        log.info("开始初始化外键缓存");
+        log.debug("开始初始化外键缓存");
         List<Class<?>> ps = PackagUtils.getClasssFromPackage(entityPackage);
         for (Class<?> p : ps) {
             MapBean map = p.getAnnotation(MapBean.class);
@@ -94,6 +91,6 @@ public class ForeignConversionService {
                 }
             }
         }
-        log.info("初始化外键缓存结束");
+        log.debug("初始化外键缓存结束");
     }
 }
