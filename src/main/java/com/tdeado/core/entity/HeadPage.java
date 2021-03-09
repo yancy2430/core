@@ -103,6 +103,7 @@ public class HeadPage<T> extends Page<T> {
                         .setWidth(field.width())
                         .setSearch(field.search().getCode())
                         .setSort(  field.sort())
+                        .setSort(field.fileType().getCode())
                         .setOptions(field.foreign().equals(Void.class)?declaredField.getType().isEnum()?declaredField.getType().getName():null:field.foreign().getName())
                 );
             }
@@ -124,6 +125,7 @@ public class HeadPage<T> extends Page<T> {
         private String foreign;
         private String options;
         private Integer sort;
+        private Integer fileType;
         public int compareTo(Head o) {
             int i = this.getSort() - o.getSort();//先按照年龄排序
             return i;
