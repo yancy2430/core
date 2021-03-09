@@ -28,7 +28,7 @@ public class TdFieldSerializer extends JsonSerializer<Object> implements Context
     @Override
     public void serialize(Object value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         Object newValue = value;
-        if (field.filePath()) {//是图片或文件 处理方式
+        if (field.fileType()!=Void.class) {//是图片或文件 处理方式
             UploadFileProperties uploadFileProperties = SpringUtils.getBean(UploadFileProperties.class);
             String cdn = uploadFileProperties.getImgDomain() + uploadFileProperties.getImgDirectory();
             if (!StringUtils.isEmpty(value.toString())) {

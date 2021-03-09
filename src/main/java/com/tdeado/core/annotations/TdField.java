@@ -55,9 +55,9 @@ public @interface TdField {
     int sort() default Integer.MAX_VALUE;
 
     /**
-     * 是否文件地址 是则添加域名地址
+     * 文件类型 是则添加域名地址
      */
-    boolean filePath() default false;
+    Class<?> fileType() default Void.class;
 
     /**
      * 外键对象
