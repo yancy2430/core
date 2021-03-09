@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.tdeado.core.annotations.TdField;
 import com.tdeado.core.config.UploadFileProperties;
+import com.tdeado.core.enums.FileType;
 import com.tdeado.core.service.ForeignConversionService;
 import com.tdeado.core.util.SpringUtils;
 import org.apache.commons.lang.StringUtils;
@@ -28,7 +29,7 @@ public class TdFieldSerializer extends JsonSerializer<Object> implements Context
     @Override
     public void serialize(Object value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         Object newValue = value;
-        if (field.fileType()!=Void.class) {//是图片或文件 处理方式
+        if (field.fileType()!= FileType.NOT) {//是图片或文件 处理方式
             UploadFileProperties uploadFileProperties = SpringUtils.getBean(UploadFileProperties.class);
             String cdn = uploadFileProperties.getImgDomain() + uploadFileProperties.getImgDirectory();
             if (!StringUtils.isEmpty(value.toString())) {

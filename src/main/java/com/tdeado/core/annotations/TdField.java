@@ -3,6 +3,7 @@ package com.tdeado.core.annotations;
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.tdeado.core.enums.FieldAlign;
+import com.tdeado.core.enums.FileType;
 import com.tdeado.core.enums.OperateType;
 import com.tdeado.core.enums.SearchType;
 import com.tdeado.core.jsonserializer.TdFieldSerializer;
@@ -57,7 +58,7 @@ public @interface TdField {
     /**
      * 文件类型 是则添加域名地址
      */
-    Class<?> fileType() default Void.class;
+    FileType fileType() default FileType.NOT;
 
     /**
      * 外键对象

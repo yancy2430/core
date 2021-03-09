@@ -1,10 +1,11 @@
 package com.tdeado.core.enums;
 
 public enum FileType implements BaseEnum<String>{
-    IMAGE(0, "图片"),
-    FILE(1, "文件"),
-    DOC(2, "文档"),
-    XLS(3, "表格")
+    NOT(0, "不是文件"),
+    IMAGE(1, "图片"),
+    FILE(2, "文件"),
+    DOC(3, "文档"),
+    XLS(4, "表格")
     ;
     private final int code;
     private final String descp;
