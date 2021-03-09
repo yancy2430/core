@@ -102,8 +102,8 @@ public class HeadPage<T> extends Page<T> {
                         .setAlign(field.align().getDescp())
                         .setWidth(field.width())
                         .setSearch(field.search().getCode())
-                        .setSort(  field.sort())
-                        .setSort(field.fileType().getCode())
+                        .setSort(field.sort())
+                        .setFileType(field.fileType().getCode())
                         .setOptions(field.foreign().equals(Void.class)?declaredField.getType().isEnum()?declaredField.getType().getName():null:field.foreign().getName())
                 );
             }
