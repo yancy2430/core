@@ -12,6 +12,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -61,7 +62,7 @@ public class HeadPage<T> extends Page<T> {
         for (T t : list) {
             for (Field declaredField : t.getClass().getDeclaredFields()) {
                 TdField field = declaredField.getAnnotation(TdField.class);
-                if (field != null && field.operate() == OperateType.IMPORT) {
+                if (field != null && !field.show()) {
                     try {
                         try {
                             Method m2 = t.getClass().getMethod("set" + capitalized(declaredField.getName()), declaredField.getType());
@@ -94,7 +95,7 @@ public class HeadPage<T> extends Page<T> {
             List<Head> list = new ArrayList<>();
             for (Field declaredField : entity.getDeclaredFields()) {
                 TdField field = declaredField.getAnnotation(TdField.class);
-                if (field == null || field.operate() == OperateType.IMPORT) {
+                if (field == null) {
                     continue;
                 }
                 Boolean key = null;
@@ -109,8 +110,14 @@ public class HeadPage<T> extends Page<T> {
                         .setWidth(field.width())
                         .setSearch(field.search().getCode())
                         .setSort(field.sort())
-                        .setFileType(field.fileType().getCode())
+                        .setContentType(field.contentType().getDescp())
                         .setOptions(field.foreign().equals(Void.class)?declaredField.getType().isEnum()?declaredField.getType().getName():null:field.foreign().getName())
+                        .setShow(field.show())
+                        .setAdd(field.add())
+                        .setEdit(field.edit())
+                        .setRequired(
+                                (null!=declaredField.getAnnotation(NotNull.class))
+                        )
                 );
             }
             Collections.sort(list);
@@ -122,7 +129,7 @@ public class HeadPage<T> extends Page<T> {
 
     @Data
     @Accessors(chain = true)
-    private class Head implements Comparable<Head>{
+    private static class Head implements Comparable<Head>{
         private Boolean key;
         private String name;
         private String title;
@@ -132,7 +139,11 @@ public class HeadPage<T> extends Page<T> {
         private String foreign;
         private String options;
         private Integer sort;
-        private Integer fileType;
+        private Boolean show;
+        private Boolean add;
+        private Boolean edit;
+        private String contentType;
+        private Boolean required;
         public int compareTo(Head o) {
             int i = this.getSort() - o.getSort();//先按照年龄排序
             return i;

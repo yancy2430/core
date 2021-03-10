@@ -1,15 +1,15 @@
 package com.tdeado.core.enums;
 
-public enum FileType implements BaseEnum<String>{
-    NOT(0, "不是文件"),
-    IMAGE(1, "图片"),
-    FILE(2, "文件"),
-    DOC(3, "文档"),
-    XLS(4, "表格")
+public enum ContentType implements BaseEnum<String>{
+    TEXT(0, "text"),
+    NUMBER(1, "number"),
+    PASS(2, "password"),
+    FILE(3, "file"),
+    IMAGE(4, "image"),
     ;
     private final int code;
     private final String descp;
-    FileType(int code, String descp) {
+    ContentType(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }
@@ -31,8 +31,8 @@ public enum FileType implements BaseEnum<String>{
      * @param code
      * @return
      */
-    public static FileType getValueByCode(Integer code){
-        for(FileType platformFree: FileType.values()){
+    public static ContentType getValueByCode(Integer code){
+        for(ContentType platformFree: ContentType.values()){
             if(code.equals(platformFree.getCode())){
                 return platformFree;
             }

@@ -2,10 +2,7 @@ package com.tdeado.core.annotations;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.tdeado.core.enums.FieldAlign;
-import com.tdeado.core.enums.FileType;
-import com.tdeado.core.enums.OperateType;
-import com.tdeado.core.enums.SearchType;
+import com.tdeado.core.enums.*;
 import com.tdeado.core.jsonserializer.TdFieldSerializer;
 
 import java.lang.annotation.ElementType;
@@ -38,6 +35,22 @@ public @interface TdField {
     OperateType operate() default OperateType.ALL;
 
     /**
+     * 内容类型
+     */
+    ContentType contentType() default ContentType.TEXT ;
+    /**
+     * 新增显示
+     */
+    boolean add() default true;
+    /**
+     * 编辑显示
+     */
+    boolean edit() default true;
+    /**
+     * 列表显示
+     */
+    boolean show() default true;
+    /**
      * 导出字段对齐方式（0：自动；1：靠左；2：居中；3：靠右）
      */
     FieldAlign align() default FieldAlign.CENTER;
@@ -54,11 +67,6 @@ public @interface TdField {
      * 字段排序
      */
     int sort() default Integer.MAX_VALUE;
-
-    /**
-     * 文件类型 是则添加域名地址
-     */
-    FileType fileType() default FileType.NOT;
 
     /**
      * 外键对象
