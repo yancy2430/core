@@ -1,5 +1,6 @@
 package com.tdeado.core.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tdeado.core.annotations.TdField;
@@ -96,7 +97,12 @@ public class HeadPage<T> extends Page<T> {
                 if (field == null || field.operate() == OperateType.IMPORT) {
                     continue;
                 }
+                Boolean key = null;
+                if (null!=declaredField.getAnnotation(TableId.class)){
+                    key = true;
+                }
                 list.add(new Head()
+                        .setKey(key)
                         .setName(declaredField.getName())
                         .setTitle(field.title())
                         .setAlign(field.align().getDescp())
@@ -117,6 +123,7 @@ public class HeadPage<T> extends Page<T> {
     @Data
     @Accessors(chain = true)
     private class Head implements Comparable<Head>{
+        private Boolean key;
         private String name;
         private String title;
         private String align;
