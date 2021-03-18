@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.enums.ApiErrorCode;
 import com.baomidou.mybatisplus.extension.exceptions.ApiException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 
@@ -80,7 +81,7 @@ public class WebException extends RuntimeException {
         /**
          * 系统内部异常，打印异常栈
          */
-        log.error("Error: handleBadRequest StackTrace : {}", e);
+        log.error(ExceptionUtils.getFullStackTrace(e));
         return R.failed(ApiErrorCode.FAILED);
     }
 }

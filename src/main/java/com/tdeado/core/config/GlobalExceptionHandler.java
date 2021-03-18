@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.exceptions.ApiException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.tdeado.core.exception.WebException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.security.auth.message.AuthException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Set;
 
@@ -32,80 +36,6 @@ import java.util.Set;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-
-    /***
-     * 登录异常绑定异常
-     * @date 2018/10/16
-     * @param exception HttpMessageNotReadableException
-     */
-    @ExceptionHandler(value = RuntimeException.class)
-    @ResponseBody
-    public R<String> runtime(RuntimeException exception){
-        exception.printStackTrace();
-        log.error("RuntimeException {}",exception.getMessage());
-        return R.failed(exception.getMessage());
-    }
-
-    @ExceptionHandler(value = MissingServletRequestParameterException.class)
-    @ResponseBody
-    public R<String> runtime(MissingServletRequestParameterException exception){
-        log.error("MissingServletRequestParameterException {}",exception.getMessage());
-        return R.failed(exception.getMessage());
-    }
-    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
-    @ResponseBody
-    public R<String> runtime(HttpRequestMethodNotSupportedException exception){
-        log.error("HttpRequestMethodNotSupportedException {}",exception.getMessage());
-        return R.failed(exception.getMessage());
-    }
-
-
-    @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    @ResponseBody
-    public R<String> runtime(MethodArgumentNotValidException c){
-        List<ObjectError> errors = c.getBindingResult().getAllErrors();
-        StringBuffer errorMsg = new StringBuffer();
-        errors.stream().forEach(x -> {
-
-            errorMsg.append(x.getDefaultMessage()).append(";");
-        });
-        return R.failed(String.valueOf(errorMsg));
-    }
-    @ExceptionHandler(value = ConstraintViolationException.class)
-    @ResponseBody
-    public R<String> runtime(ConstraintViolationException exception){
-        Set<ConstraintViolation<?>> cves = exception.getConstraintViolations();
-        StringBuffer errorMsg = new StringBuffer();
-        cves.forEach(ex -> errorMsg.append(ex.getMessage()));
-        return R.failed(String.valueOf(errorMsg));
-    }
-
-
-    /***
-     * 登录异常绑定异常
-     * @date 2018/10/16
-     * @param exception HttpMessageNotReadableException
-     */
-    @ExceptionHandler(value = AuthException.class)
-    @ResponseBody
-    public R<Object> authForBidden(AuthException exception){
-//        exception.printStackTrace();
-        log.error("AuthException {}",exception.getMessage());
-        return R.failed(exception.getMessage());
-    }
-    /***
-     * 登录异常绑定异常
-     * @date 2018/10/16
-     * @param exception HttpMessageNotReadableException
-     */
-    @ExceptionHandler(value = ApiException.class)
-    @ResponseBody
-    public R<Object> authForBidden(ApiException exception){
-//        exception.printStackTrace();
-        log.error("AuthException {}",exception.getMessage());
-        return R.failed(exception.getMessage());
-    }
     /***
      * 参数绑定异常
      * @date 2018/10/16
@@ -114,8 +44,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseBody
     public R<Object> messageNotReadable(HttpMessageNotReadableException exception){
-//        exception.printStackTrace();
-        log.error("HttpMessageNotReadableException {}",exception.getMessage());
+        log.error("HttpMessageNotReadableException",exception);
         InvalidFormatException formatException = (InvalidFormatException)exception.getCause();
         List<JsonMappingException.Reference> e = formatException.getPath();
         String fieldName = "";
@@ -136,8 +65,6 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler(value = Exception.class)
     public R<Object> handleBadRequest(Exception e) {
-        e.printStackTrace();
-        log.error("Exception {}",e.getMessage());
-        return R.failed(e.getMessage());
+        return WebException.handleBadRequest(e);
     }
 }
