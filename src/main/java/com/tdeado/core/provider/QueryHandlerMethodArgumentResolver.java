@@ -1,13 +1,16 @@
 package com.tdeado.core.provider;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.tdeado.core.annotations.TdField;
 import com.tdeado.core.entity.Entity;
 import com.tdeado.core.enums.OperateType;
 import com.tdeado.core.enums.SearchType;
+import com.tdeado.core.util.SpringUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +28,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.baomidou.mybatisplus.core.toolkit.StringUtils.camelToUnderline;
@@ -85,30 +89,30 @@ public class QueryHandlerMethodArgumentResolver implements HandlerMethodArgument
             Type type = ((ParameterizedType) methodParameter.getGenericParameterType()).getActualTypeArguments()[0];
             //通过反射获取泛型的类属性列表
             Class<?> aClass = Class.forName(type.getTypeName());
-            for (Field declaredField : aClass.getDeclaredFields()) {
-                TdField field = declaredField.getAnnotation(TdField.class);
-                String fieldName = declaredField.getName();
-                if (null==field || null==json.get(fieldName)){
+            String table = StringUtils.firstToLowerCase(aClass.getSimpleName());
+            IService impl=SpringUtils.getBean("sysTableCustomServiceImpl");
+
+
+            List<Map<String,Object>> ls = impl.listMaps((Wrapper) new QueryWrapper().eq("table_name", table));
+
+            for (Map<String,Object> declaredField : ls) {
+                String fieldName = declaredField.get("tableField").toString();
+               Integer search_type = Integer.parseInt(declaredField.get("searchType").toString());
+                if (null==json.get(fieldName)){
                     continue;
                 }
                 String fieldValue = json.get(fieldName).getAsString();
-                if (Objects.isNull(field) || field.search() == SearchType.NOT || StringUtils.isBlank(fieldValue) || field.operate() == OperateType.EXPORT) {
+                if (search_type == 0 || StringUtils.isBlank(fieldValue)) {
                     continue;
                 }
-                fieldName = camelToUnderline(declaredField.getName());
-                declaredField.setAccessible(true);
 
-                if (field.search() == SearchType.LIKE) {
+                if (search_type == 1) {
                     queryWrapper.like(fieldName, fieldValue);
                 }
-                if (field.search() == SearchType.EQ) {
+                if (search_type == 2 || search_type==3) {
                     queryWrapper.eq(fieldName, fieldValue);
                 }
-                if (field.search() == SearchType.IN) {
-                    List<String> id = Arrays.asList(fieldValue.split(","));
-                    queryWrapper.in(id.size() > 0, fieldName, id);
-                }
-                if (field.search() == SearchType.DATETIME || field.search() == SearchType.DATE || field.search() == SearchType.BW) {
+                if (search_type == 4 || search_type == 6 || search_type == 8) {
                     List<String> datetimes = Arrays.asList(fieldValue.split(","));
                     queryWrapper.between(datetimes.size()==2,fieldName,datetimes.get(0), datetimes.get(1));
                 }
