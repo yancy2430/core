@@ -116,6 +116,7 @@ public class QueryHandlerMethodArgumentResolver implements HandlerMethodArgument
                     List<String> datetimes = Arrays.asList(fieldValue.split(","));
                     queryWrapper.between(datetimes.size()==2,fieldName,datetimes.get(0), datetimes.get(1));
                 }
+                request.setAttribute(fieldName, fieldValue);
             }
             return queryWrapper;
         }
