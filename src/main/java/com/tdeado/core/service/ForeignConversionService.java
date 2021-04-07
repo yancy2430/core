@@ -3,7 +3,6 @@ package com.tdeado.core.service;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.sun.tools.javac.util.StringUtils;
 import com.tdeado.core.annotations.MapBean;
 import com.tdeado.core.annotations.MapId;
 import com.tdeado.core.annotations.MapName;
