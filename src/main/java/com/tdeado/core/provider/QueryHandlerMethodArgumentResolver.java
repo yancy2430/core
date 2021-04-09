@@ -96,27 +96,33 @@ public class QueryHandlerMethodArgumentResolver implements HandlerMethodArgument
             List<Map<String,Object>> ls = impl.listMaps((Wrapper) new QueryWrapper().eq("table_name", table));
 
             for (Map<String,Object> declaredField : ls) {
+
                 String fieldName = declaredField.get("tableField").toString();
-               Integer search_type = Integer.parseInt(declaredField.get("searchType").toString());
-                if (null==json.get(fieldName)){
+                Integer search_type = Integer.parseInt(declaredField.get("searchType").toString());
+                if (null==json.get(fieldName) || json.get(fieldName).isJsonNull()){
                     continue;
                 }
                 String fieldValue = json.get(fieldName).getAsString();
+
                 if (search_type == 0 || StringUtils.isBlank(fieldValue)) {
                     continue;
                 }
-
+                request.setAttribute(fieldName, fieldValue);
+                fieldName = StringUtils.camelToUnderline(fieldName);
                 if (search_type == 1) {
                     queryWrapper.like(fieldName, fieldValue);
                 }
                 if (search_type == 2 || search_type==3) {
                     queryWrapper.eq(fieldName, fieldValue);
                 }
+                if (search_type == 5 || search_type == 7 ) {
+                    queryWrapper.eq(fieldName, fieldValue);
+                }
                 if (search_type == 4 || search_type == 6 || search_type == 8) {
                     List<String> datetimes = Arrays.asList(fieldValue.split(","));
                     queryWrapper.between(datetimes.size()==2,fieldName,datetimes.get(0), datetimes.get(1));
                 }
-                request.setAttribute(fieldName, fieldValue);
+
             }
             return queryWrapper;
         }
