@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.tdeado.core.annotations.TdField;
@@ -84,6 +85,7 @@ public class QueryHandlerMethodArgumentResolver implements HandlerMethodArgument
             }
             String body = IOUtils.toString(requestWapper.getInputStream(),request.getCharacterEncoding());
             JsonObject json = JsonParser.parseString(body).getAsJsonObject();
+
             QueryWrapper<Entity> queryWrapper = new QueryWrapper<>();
             //泛型类型
             Type type = ((ParameterizedType) methodParameter.getGenericParameterType()).getActualTypeArguments()[0];
@@ -95,35 +97,45 @@ public class QueryHandlerMethodArgumentResolver implements HandlerMethodArgument
 
             List<Map<String,Object>> ls = impl.listMaps((Wrapper) new QueryWrapper().eq("table_name", table));
 
-            for (Map<String,Object> declaredField : ls) {
+            JsonObject queryJson = json.getAsJsonObject("query");
+            if (null!=queryJson && !queryJson.isJsonNull()){
+                for (Map<String,Object> declaredField : ls) {
 
-                String fieldName = declaredField.get("tableField").toString();
-                Integer search_type = Integer.parseInt(declaredField.get("searchType").toString());
-                if (null==json.get(fieldName) || json.get(fieldName).isJsonNull()){
-                    continue;
-                }
-                String fieldValue = json.get(fieldName).getAsString();
+                    String fieldName = declaredField.get("tableField").toString();
+                    Integer search_type = Integer.parseInt(declaredField.get("searchType").toString());
+                    if (null==queryJson.get(fieldName) || queryJson.get(fieldName).isJsonNull()){
+                        continue;
+                    }
+                    String fieldValue = queryJson.get(fieldName).getAsString();
 
-                if (search_type == 0 || StringUtils.isBlank(fieldValue)) {
-                    continue;
-                }
-                request.setAttribute(fieldName, fieldValue);
-                fieldName = StringUtils.camelToUnderline(fieldName);
-                if (search_type == 1) {
-                    queryWrapper.like(fieldName, fieldValue);
-                }
-                if (search_type == 2 || search_type==3) {
-                    queryWrapper.eq(fieldName, fieldValue);
-                }
-                if (search_type == 5 || search_type == 7 ) {
-                    queryWrapper.eq(fieldName, fieldValue);
-                }
-                if (search_type == 4 || search_type == 6 || search_type == 8) {
-                    List<String> datetimes = Arrays.asList(fieldValue.split(","));
-                    queryWrapper.between(datetimes.size()==2,fieldName,datetimes.get(0), datetimes.get(1));
-                }
+                    if (search_type == 0 || StringUtils.isBlank(fieldValue)) {
+                        continue;
+                    }
+                    request.setAttribute(fieldName, fieldValue);
+                    fieldName = StringUtils.camelToUnderline(fieldName);
+                    if (search_type == 1) {
+                        queryWrapper.like(fieldName, fieldValue);
+                    }
+                    if (search_type == 2 || search_type==3) {
+                        queryWrapper.eq(fieldName, fieldValue);
+                    }
+                    if (search_type == 5 || search_type == 7 ) {
+                        queryWrapper.eq(fieldName, fieldValue);
+                    }
+                    if (search_type == 4 || search_type == 6 || search_type == 8) {
+                        List<String> datetimes = Arrays.asList(fieldValue.split(","));
+                        queryWrapper.between(datetimes.size()==2,fieldName,datetimes.get(0), datetimes.get(1));
+                    }
 
+                }
             }
+            JsonObject sortJson = json.getAsJsonObject("sort");
+            if (null!=sortJson && !sortJson.isJsonNull()){
+                for (Map.Entry<String, JsonElement> sort : sortJson.entrySet()) {
+                    queryWrapper.orderBy(!sort.getValue().isJsonNull(),sort.getValue().getAsString().equals("asc"),StringUtils.camelToUnderline(sort.getKey()));
+                }
+            }
+
             return queryWrapper;
         }
         return requestResponseBodyMethodProcessor.resolveArgument(methodParameter,
