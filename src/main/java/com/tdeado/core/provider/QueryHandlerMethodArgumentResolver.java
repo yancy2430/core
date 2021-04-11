@@ -106,24 +106,32 @@ public class QueryHandlerMethodArgumentResolver implements HandlerMethodArgument
                     if (null==queryJson.get(fieldName) || queryJson.get(fieldName).isJsonNull()){
                         continue;
                     }
-                    String fieldValue = queryJson.get(fieldName).getAsString();
-
-                    if (search_type == 0 || StringUtils.isBlank(fieldValue)) {
+                    StringBuilder fieldValue = new StringBuilder();
+                    JsonElement jsonValue = queryJson.get(fieldName);
+                    if (jsonValue.isJsonArray()){
+                        for (JsonElement element : jsonValue.getAsJsonArray()) {
+                            fieldValue.append(element.getAsString());
+                            fieldValue.append(",");
+                        }
+                    }else {
+                        fieldValue = new StringBuilder(jsonValue.getAsString());
+                    }
+                    if (search_type == 0 || StringUtils.isBlank(fieldValue.toString())) {
                         continue;
                     }
-                    request.setAttribute(fieldName, fieldValue);
+                    request.setAttribute(fieldName, fieldValue.toString());
                     fieldName = StringUtils.camelToUnderline(fieldName);
                     if (search_type == 1) {
-                        queryWrapper.like(fieldName, fieldValue);
+                        queryWrapper.like(fieldName, fieldValue.toString());
                     }
                     if (search_type == 2 || search_type==3) {
-                        queryWrapper.eq(fieldName, fieldValue);
+                        queryWrapper.eq(fieldName, fieldValue.toString());
                     }
                     if (search_type == 5 || search_type == 7 ) {
-                        queryWrapper.eq(fieldName, fieldValue);
+                        queryWrapper.eq(fieldName, fieldValue.toString());
                     }
                     if (search_type == 4 || search_type == 6 || search_type == 8) {
-                        List<String> datetimes = Arrays.asList(fieldValue.split(","));
+                        List<String> datetimes = Arrays.asList(fieldValue.toString().split(","));
                         queryWrapper.between(datetimes.size()==2,fieldName,datetimes.get(0), datetimes.get(1));
                     }
 
