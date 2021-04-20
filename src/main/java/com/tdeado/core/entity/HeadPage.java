@@ -153,7 +153,7 @@ public class HeadPage<T> extends Page<T> {
     @Data
     @Accessors(chain = true)
     public static class Option {
-        private String value;
+        private Object value;
         private String label;
     }
 }

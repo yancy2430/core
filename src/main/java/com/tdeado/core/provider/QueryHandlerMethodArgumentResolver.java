@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -72,20 +73,21 @@ public class QueryHandlerMethodArgumentResolver implements HandlerMethodArgument
     public Object resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer,
                                   NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory)
             throws Exception {
-
+        ContentCachingRequestWrapper request = new ContentCachingRequestWrapper(nativeWebRequest.getNativeRequest(HttpServletRequest.class));
+        if (request == null) {
+            throw  new RuntimeException(" request must not be null!");
+        }
+        request.getParameterMap();
+        String read = new String(request.getContentAsByteArray()); //Please note that we're not touching input stream!!
         if (methodParameter.getParameterType().getName().equals("com.baomidou.mybatisplus.core.conditions.query.QueryWrapper")){
-            ContentCachingRequestWrapper request = new ContentCachingRequestWrapper(nativeWebRequest.getNativeRequest(HttpServletRequest.class));
-            if (request == null) {
-                throw  new RuntimeException(" request must not be null!");
+            String body = IOUtils.toString(request.getInputStream(),request.getCharacterEncoding());
+            if (StringUtils.isBlank(body)){
+                return new QueryWrapper<>();
             }
-
-            ContentCachingRequestWrapper requestWapper = null;
-            if(request instanceof HttpServletRequest){
-                requestWapper = (ContentCachingRequestWrapper) request;
-            }
-            String body = IOUtils.toString(requestWapper.getInputStream(),request.getCharacterEncoding());
             JsonObject json = JsonParser.parseString(body).getAsJsonObject();
-
+            for (Map.Entry<String, JsonElement> stringJsonElementEntry : json.entrySet()) {
+                request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry);
+            }
             QueryWrapper<Entity> queryWrapper = new QueryWrapper<>();
             //泛型类型
             Type type = ((ParameterizedType) methodParameter.getGenericParameterType()).getActualTypeArguments()[0];
@@ -93,8 +95,6 @@ public class QueryHandlerMethodArgumentResolver implements HandlerMethodArgument
             Class<?> aClass = Class.forName(type.getTypeName());
             String table = StringUtils.firstToLowerCase(aClass.getSimpleName());
             IService impl=SpringUtils.getBean("sysTableCustomServiceImpl");
-
-
             List<Map<String,Object>> ls = impl.listMaps((Wrapper) new QueryWrapper().eq("table_name", table));
 
             JsonObject queryJson = json.getAsJsonObject("query");
@@ -146,7 +146,9 @@ public class QueryHandlerMethodArgumentResolver implements HandlerMethodArgument
 
             return queryWrapper;
         }
-        return requestResponseBodyMethodProcessor.resolveArgument(methodParameter,
+        Object obj = requestResponseBodyMethodProcessor.resolveArgument(methodParameter,
                 modelAndViewContainer, nativeWebRequest, webDataBinderFactory);
+
+        return obj;
     }
 }
