@@ -1,5 +1,6 @@
 package com.tdeado.core.provider;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBody
 import org.springframework.web.servlet.mvc.method.annotation.ServletModelAttributeMethodProcessor;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -85,7 +87,6 @@ public class QueryHandlerMethodArgumentResolver implements HandlerMethodArgument
             String table = StringUtils.firstToLowerCase(aClass.getSimpleName());
             IService impl=SpringUtils.getBean("sysTableCustomServiceImpl");
             List<Map<String,Object>> ls = impl.listMaps((Wrapper) new QueryWrapper().eq("table_name", table));
-
             JsonObject queryJson = json.getAsJsonObject("query");
             if (null!=queryJson && !queryJson.isJsonNull()){
                 for (Map<String,Object> declaredField : ls) {
@@ -127,12 +128,21 @@ public class QueryHandlerMethodArgumentResolver implements HandlerMethodArgument
                 }
             }
             JsonObject sortJson = json.getAsJsonObject("sort");
+
             if (null!=sortJson && !sortJson.isJsonNull()){
                 for (Map.Entry<String, JsonElement> sort : sortJson.entrySet()) {
-                    queryWrapper.orderBy(!sort.getValue().isJsonNull(),sort.getValue().getAsString().equals("asc"),StringUtils.camelToUnderline(sort.getKey()));
+                    queryWrapper.orderBy(!sort.getValue().isJsonNull(),sort.getValue().getAsString().equals("desc"),StringUtils.camelToUnderline(sort.getKey()));
                 }
+            }else {
+                String field = "";
+                for (Field declaredField : aClass.getDeclaredFields()) {
+                    TableId fieldAnnotation = declaredField.getAnnotation(TableId.class);
+                    if (null!=fieldAnnotation){
+                        field = declaredField.getName();
+                    }
+                }
+                queryWrapper.orderByDesc(StringUtils.isNotBlank(field),StringUtils.camelToUnderline(field));
             }
-
             return queryWrapper;
         }
         Object obj = requestResponseBodyMethodProcessor.resolveArgument(methodParameter,
