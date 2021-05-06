@@ -89,6 +89,9 @@ public class QueryHandlerMethodArgumentResolver implements HandlerMethodArgument
             List<Map<String,Object>> ls = impl.listMaps((Wrapper) new QueryWrapper().eq("table_name", table));
             JsonObject queryJson = json.getAsJsonObject("query");
             if (null!=queryJson && !queryJson.isJsonNull()){
+                for (Map.Entry<String, JsonElement> stringJsonElementEntry : queryJson.entrySet()) {
+                    request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
+                }
                 for (Map<String,Object> declaredField : ls) {
 
                     String fieldName = declaredField.get("tableField").toString();
@@ -109,7 +112,6 @@ public class QueryHandlerMethodArgumentResolver implements HandlerMethodArgument
                     if (search_type == 0 || StringUtils.isBlank(fieldValue.toString())) {
                         continue;
                     }
-                    request.setAttribute(fieldName, fieldValue.toString());
                     fieldName = StringUtils.camelToUnderline(fieldName);
                     if (search_type == 1) {
                         queryWrapper.like(fieldName, fieldValue.toString());
