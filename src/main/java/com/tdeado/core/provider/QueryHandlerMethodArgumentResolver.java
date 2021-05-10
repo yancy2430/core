@@ -90,7 +90,11 @@ public class QueryHandlerMethodArgumentResolver implements HandlerMethodArgument
             JsonObject queryJson = json.getAsJsonObject("query");
             if (null!=queryJson && !queryJson.isJsonNull()){
                 for (Map.Entry<String, JsonElement> stringJsonElementEntry : queryJson.entrySet()) {
-                    request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
+                    if (!stringJsonElementEntry.getValue().isJsonPrimitive() && StringUtils.isNotBlank(stringJsonElementEntry.getValue().getAsString())){
+                        request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
+                    }else {
+                        request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue());
+                    }
                 }
                 for (Map<String,Object> declaredField : ls) {
 
