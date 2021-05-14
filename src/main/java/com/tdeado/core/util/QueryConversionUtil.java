@@ -36,7 +36,7 @@ public class QueryConversionUtil {
             for (Map.Entry<String, JsonElement> stringJsonElementEntry : queryJson.entrySet()) {
                 if (stringJsonElementEntry.getValue().isJsonArray() || stringJsonElementEntry.getValue().isJsonObject()){
                     request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue());
-                }else if (StringUtils.isNotBlank(stringJsonElementEntry.getValue().getAsString())){
+                }else if (null!=stringJsonElementEntry.getValue() && !stringJsonElementEntry.getValue().isJsonNull() && StringUtils.isNotBlank(stringJsonElementEntry.getValue().getAsString())){
                     request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
                 }else {
                     request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue());
