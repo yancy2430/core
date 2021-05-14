@@ -6,7 +6,7 @@
 
     <groupId>com.tdeado</groupId>
     <artifactId>tdeado-core-spring-boot-starter</artifactId>
-    <version>2.9</version>
+    <version>3.0</version>
 
     <build>
         <plugins>
