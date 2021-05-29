@@ -1,5 +1,6 @@
 package com.tdeado.core.util;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -16,6 +17,10 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class QueryConversionUtil {
 
@@ -27,6 +32,7 @@ public class QueryConversionUtil {
         for (Map.Entry<String, JsonElement> stringJsonElementEntry : json.entrySet()) {
             request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry);
         }
+        Map<String, String> skipList = Arrays.stream(aClass.getDeclaredFields()).filter(field -> Objects.nonNull(field.getAnnotation(TableField.class)) && !field.getAnnotation(TableField.class).exist()).collect(Collectors.toMap(Field::getName, Field::getName));
         //通过反射获取泛型的类属性列表
         String table = StringUtils.firstToLowerCase(aClass.getSimpleName());
         IService impl=SpringUtils.getBean("sysTableCustomServiceImpl");
@@ -39,14 +45,14 @@ public class QueryConversionUtil {
                 }else if (null!=stringJsonElementEntry.getValue() && !stringJsonElementEntry.getValue().isJsonNull() && StringUtils.isNotBlank(stringJsonElementEntry.getValue().getAsString())){
                     request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
                 }else {
-                    request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue());
+                    request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
                 }
             }
             for (Map<String,Object> declaredField : ls) {
 
                 String fieldName = declaredField.get("tableField").toString();
                 Integer search_type = Integer.parseInt(declaredField.get("searchType").toString());
-                if (null==queryJson.get(fieldName) || queryJson.get(fieldName).isJsonNull()){
+                if (null==queryJson.get(fieldName) || queryJson.get(fieldName).isJsonNull() || null!=skipList.get(fieldName)){
                     continue;
                 }
                 StringBuilder fieldValue = new StringBuilder();
