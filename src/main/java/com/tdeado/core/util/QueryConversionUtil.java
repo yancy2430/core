@@ -65,10 +65,13 @@ public class QueryConversionUtil {
                 }else {
                     fieldValue = new StringBuilder(jsonValue.getAsString());
                 }
-                if (search_type == 0 || StringUtils.isBlank(fieldValue.toString())) {
+                if (StringUtils.isBlank(fieldValue.toString())) {
                     continue;
                 }
                 fieldName = StringUtils.camelToUnderline(fieldName);
+                if (search_type == 0) {
+                    queryWrapper.eq(fieldName, fieldValue.toString());
+                }
                 if (search_type == 1) {
                     queryWrapper.like(fieldName, fieldValue.toString());
                 }
