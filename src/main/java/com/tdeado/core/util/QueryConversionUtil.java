@@ -85,6 +85,9 @@ public class QueryConversionUtil {
                     List<String> datetimes = Arrays.asList(fieldValue.toString().split(","));
                     queryWrapper.between(datetimes.size()==2,fieldName,datetimes.get(0), datetimes.get(1));
                 }
+                if (search_type == 9) {
+                    queryWrapper.in(fieldName, fieldValue.toString().split(","));
+                }
 
             }
         }
