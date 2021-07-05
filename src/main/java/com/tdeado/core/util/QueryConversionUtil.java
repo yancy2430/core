@@ -14,13 +14,8 @@ import com.tdeado.core.entity.Entity;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Predicate;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class QueryConversionUtil {
 
@@ -30,7 +25,7 @@ public class QueryConversionUtil {
         QueryWrapper<Entity> queryWrapper = new QueryWrapper<>();
         JsonObject json = JsonParser.parseString(body).getAsJsonObject();
         for (Map.Entry<String, JsonElement> stringJsonElementEntry : json.entrySet()) {
-            request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry);
+            request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue());
         }
         Map<String, String> skipList = Arrays.stream(aClass.getDeclaredFields()).filter(field -> Objects.nonNull(field.getAnnotation(TableField.class)) && !field.getAnnotation(TableField.class).exist()).collect(Collectors.toMap(Field::getName, Field::getName));
         //通过反射获取泛型的类属性列表
@@ -44,7 +39,7 @@ public class QueryConversionUtil {
                     request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue());
                 }else if (null!=stringJsonElementEntry.getValue() && !stringJsonElementEntry.getValue().isJsonNull() && StringUtils.isNotBlank(stringJsonElementEntry.getValue().getAsString())){
                     request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
-                }else {
+                }else if (null!=stringJsonElementEntry.getValue() && !stringJsonElementEntry.getValue().isJsonNull()){
                     request.setAttribute(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
                 }
             }
@@ -58,10 +53,13 @@ public class QueryConversionUtil {
                 StringBuilder fieldValue = new StringBuilder();
                 JsonElement jsonValue = queryJson.get(fieldName);
                 if (jsonValue.isJsonArray()){
+                    List<String> str = new ArrayList<>();
                     for (JsonElement element : jsonValue.getAsJsonArray()) {
-                        fieldValue.append(element.getAsString());
-                        fieldValue.append(",");
+                        if(StringUtils.isNotBlank(element.getAsString())){
+                            str.add(element.getAsString());
+                        }
                     }
+                    fieldValue.append(org.apache.commons.lang.StringUtils.join(str,","));
                 }else {
                     fieldValue = new StringBuilder(jsonValue.getAsString());
                 }
