@@ -23,8 +23,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class QueryConversionUtil {
-
     public static QueryWrapper requestToQuery(HttpServletRequest request,Class<?> aClass,String body) throws IOException {
+       return requestToQuery(request,aClass,body,false);
+    }
+    public static QueryWrapper requestToQuery(HttpServletRequest request,Class<?> aClass,String body,boolean notSort) throws IOException {
 
 
         QueryWrapper<Entity> queryWrapper = new QueryWrapper<>();
@@ -94,7 +96,7 @@ public class QueryConversionUtil {
             for (Map.Entry<String, JsonElement> sort : sortJson.entrySet()) {
                 queryWrapper.orderBy(!sort.getValue().isJsonNull(),sort.getValue().getAsString().equals("desc"),StringUtils.camelToUnderline(sort.getKey()));
             }
-        }else {
+        }else if (!notSort){
             String field = "";
             for (Field declaredField : aClass.getDeclaredFields()) {
                 TableId fieldAnnotation = declaredField.getAnnotation(TableId.class);
