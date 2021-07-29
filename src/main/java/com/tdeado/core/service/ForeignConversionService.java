@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.tdeado.core.annotations.MapBean;
 import com.tdeado.core.annotations.MapId;
 import com.tdeado.core.annotations.MapName;
+import com.tdeado.core.annotations.MapSort;
 import com.tdeado.core.util.PackagUtils;
 import com.tdeado.core.util.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -70,6 +71,7 @@ public class ForeignConversionService {
         for (Class<?> p : ps) {
             MapBean map = p.getAnnotation(MapBean.class);
             if (null!=map){
+                String sortField ="";
                 String idField ="";
                 String nameField ="";
                 for (Field declaredField : p.getDeclaredFields()) {
@@ -78,12 +80,15 @@ public class ForeignConversionService {
                     }
                     if (null != declaredField.getAnnotation(MapId.class)) {
                         idField = declaredField.getName();
+                    }  if (null != declaredField.getAnnotation(MapSort.class)) {
+                        sortField = declaredField.getName();
                     }
                 }
                 TableName tableName = p.getAnnotation(TableName.class);
                 String table = tableName.value().replace(prefix,"");
                 BaseMapper baseMapper = springUtils.getBean(underlineToCamel(table) + "Mapper");
-                List<Map<String,Object>> list = baseMapper.selectMaps(new QueryWrapper().select(camelToUnderline(idField)+" as value",camelToUnderline(nameField)+" as label"));
+                List<Map<String,Object>> list = baseMapper.selectMaps(new QueryWrapper().select(camelToUnderline(idField)+" as value",camelToUnderline(nameField)+" as label").orderBy(!sortField.equals(""),true,sortField)
+                );
                 for (Map<String, Object> stringMap : list) {
                     redisService.set(p.getName()+"_"+idField+"_"+stringMap.get("value").toString(),stringMap);
                     redisService.set(p.getName()+"_"+nameField+"_"+stringMap.get("label").toString(),stringMap);
