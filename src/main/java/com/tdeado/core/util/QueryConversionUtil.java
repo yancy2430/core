@@ -81,7 +81,7 @@ public class QueryConversionUtil {
                 if (search_type == 5 || search_type == 7 ) {
                     queryWrapper.eq(fieldName, fieldValue.toString());
                 }
-                if (search_type == 4 || search_type == 6 || search_type == 8) {
+                if (search_type == 4 || search_type == 6 || search_type == 8 || search_type == 10) {
                     List<String> datetimes = Arrays.asList(fieldValue.toString().split(","));
                     queryWrapper.between(datetimes.size()==2,fieldName,datetimes.get(0), datetimes.get(1));
                 }
