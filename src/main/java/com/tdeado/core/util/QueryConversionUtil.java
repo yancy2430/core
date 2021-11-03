@@ -68,7 +68,9 @@ public class QueryConversionUtil {
                 if (StringUtils.isBlank(fieldValue.toString())) {
                     continue;
                 }
-                fieldName = StringUtils.camelToUnderline(fieldName);
+                fieldName = "`"+StringUtils.camelToUnderline(fieldName)+"`";
+
+
                 if (search_type == 0) {
                     queryWrapper.eq(fieldName, fieldValue.toString());
                 }
