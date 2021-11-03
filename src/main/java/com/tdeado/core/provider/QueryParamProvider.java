@@ -1,5 +1,6 @@
 package com.tdeado.core.provider;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.google.gson.JsonElement;
@@ -57,12 +58,17 @@ public class QueryParamProvider implements HandlerMethodArgumentResolver {
             JsonObject json = JsonParser.parseString(body).getAsJsonObject();
             for (Field declaredField : requestQuery.dto().getDeclaredFields()) {
                 TdField field = declaredField.getAnnotation(TdField.class);
+                TableField tableField = declaredField.getAnnotation(TableField.class);
                 String fieldName = declaredField.getName();
                 String fieldValue = json.get(fieldName).getAsString();
                 if (Objects.isNull(field) || field.search() == SearchType.NOT || StringUtils.isBlank(fieldValue) || field.operate() == OperateType.EXPORT) {
                     continue;
                 }
                 fieldName = camelToUnderline(declaredField.getName());
+                if (null != tableField && StringUtils.isNotBlank(tableField.value())){
+                    fieldName = tableField.value();
+                }
+
                 declaredField.setAccessible(true);
                 if (field.search() == SearchType.LIKE) {
                     queryWrapper.like(fieldName, fieldValue);
