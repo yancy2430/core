@@ -120,12 +120,38 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
+    public boolean rpush(String key, String value) {
+        boolean result = redisTemplate.execute(new RedisCallback<Boolean>() {
+            @Override
+            public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
+                RedisSerializer<String> serializer = redisTemplate.getStringSerializer();
+                connection.rPush(serializer.serialize(key), serializer.serialize(value));
+                return true;
+            }
+        });
+        return result;
+    }
+
+    @Override
     public long llen(String key) {
         long result = redisTemplate.execute(new RedisCallback<Long>() {
             @Override
             public Long doInRedis(RedisConnection connection) throws DataAccessException {
                 RedisSerializer<String> serializer = redisTemplate.getStringSerializer();
                 return connection.lLen(serializer.serialize(key));
+            }
+        });
+        return result;
+    }
+
+    @Override
+    public String lpop(String key) {
+        String result = redisTemplate.execute(new RedisCallback<String>() {
+            @Override
+            public String doInRedis(RedisConnection connection) throws DataAccessException {
+                RedisSerializer<String> serializer = redisTemplate.getStringSerializer();
+                byte[] value = connection.lPop(serializer.serialize(key));
+                return serializer.deserialize(value);
             }
         });
         return result;

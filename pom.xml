@@ -6,7 +6,7 @@
 
     <groupId>com.tdeado</groupId>
     <artifactId>tdeado-core-spring-boot-starter</artifactId>
-    <version>3.2.10</version>
+    <version>3.2.12</version>
 
     <build>
         <plugins>
@@ -164,6 +164,32 @@
             <url>http://nexus.tdeado.com/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>nexus-aliyun</id>
+            <name>Nexus aliyun</name>
+            <layout>default</layout>
+            <url>https://maven.aliyun.com/nexus/content/groups/public</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>releases</id>
+            <name>tdeado</name>
+            <url>https://nexus.tdeado.com/repository/maven-public/</url>
+        </repository>
+    </repositories>
     <pluginRepositories>
         <pluginRepository>
             <releases>
@@ -176,6 +202,5 @@
             <name>tdeado</name>
             <url>https://nexus.tdeado.com/repository/maven-public/</url>
         </pluginRepository>
-
     </pluginRepositories>
 </project>

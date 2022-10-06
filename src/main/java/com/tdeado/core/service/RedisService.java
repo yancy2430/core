@@ -63,11 +63,24 @@ public interface RedisService {
      */
     boolean lpush(String key, String value);
     /**
+     * 右侧添加一个元素
+     * @param key 列名
+     * @param value 值
+     * @return
+     */
+    boolean rpush(String key, String value);
+    /**
      * 队列长度
      * @param key 队列名
      * @return
      */
     long llen(String key);
+    /**
+     * 右侧弹出一个元素
+     * @param key 队列长度
+     * @return
+     */
+    String lpop(String key);
     /**
      * 右侧弹出一个元素
      * @param key 队列长度
